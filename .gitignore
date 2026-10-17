@@ -1,0 +1,19 @@
+# here we add files which we don't want to push
+
+# downloaded dataset
+
+data/
+
+# python cache
+
+__pycache__/
+
+# trained model
+
+*.pth
+*.pt
+
+
+
+
+
