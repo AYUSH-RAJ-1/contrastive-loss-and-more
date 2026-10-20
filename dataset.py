@@ -1,6 +1,6 @@
 # this contains the dataloader for test and training
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from torchvision import datasets
 from torchvision.transforms import v2
 import random
@@ -8,7 +8,7 @@ import random
 
 
 def load_training_data():
-    transfrom = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
+    transform = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
     training_data = datasets.FashionMNIST(
         root='data',
         train=True,
@@ -18,7 +18,7 @@ def load_training_data():
     return training_data
 
 def load_testing_data():
-    transfrom = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
+    transform = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
     testing_data=datasets.FashionMNIST(
         root='data',
         train=False,
@@ -38,13 +38,13 @@ class SiameseTrainingData(Dataset):
 
         self.dataset = dataset
 
-        self.target = [int(label) for label in dataset.targets]
+        self.targets = [int(label) for label in dataset.targets]
 
         self.indices_by_labels = {}
         # enumerate returns idx + value of that dataset
-        for idx, label in enumerate(dataset.targets):
+        for idx, label in enumerate(self.targets):
             self.indices_by_labels.setdefault(label,[]).append(idx)
-        self.labels = sorted(set(self.target))
+        self.labels = sorted(set(self.targets))
 
     def __len__(self):
 
@@ -60,7 +60,7 @@ class SiameseTrainingData(Dataset):
 
         random = random.Random()
 
-        if random < 0.5:
+        if random.Random() < 0.5:
             # generate same pair
 
             idx2 = random.choice(self.indices_by_labels[label1]) 
@@ -98,7 +98,7 @@ class SiameseNetworkTestingData(Dataset):
 
         self.indices_by_labels = {}
 
-        for idx, label in enumerate(dataset.targets):
+        for idx, label in enumerate(self.targets):
             self.indices_by_labels.setdefault(int(label),[]).append(idx)
         self.labels = sorted(set(self.targets))
         # print('keys',self.indices_by_labels.keys())
@@ -125,7 +125,7 @@ class SiameseNetworkTestingData(Dataset):
 
     def __len__(self):
 
-        return len(self.dataset)
+        return len(self.pairs)
 
     def __getitem__(self, idx):
 
