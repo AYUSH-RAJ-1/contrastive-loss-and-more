@@ -19,15 +19,20 @@ class CNNEmbedding(nn.Module):
                 kernel_size=3,
                 padding=1
             ),
-            nn.ReLU(),# simple to calculate and easy gradient passing
-
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            # simple to calculate and easy gradient passing
+            # increasing the receptive field of the information
             nn.Conv2d(
                 in_channels=32,
                 out_channels=64,
                 kernel_size=3,
                 padding=1,
 
-            )
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+
         )
 
         # we need flattened output
