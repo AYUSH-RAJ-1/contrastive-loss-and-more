@@ -36,16 +36,58 @@ class CNNEmbedding(nn.Module):
         )
 
         # we need flattened output
-        self.flatten = nn.Flatten()# our dimention[0] will be preserved and after all that will be merged
+        self.flatten = nn.Flatten(start_dim=0)# our dimention[0] will be preserved and after all that will be merged
 
-        self.embedding = nn.Linear[64*7*7,128]# linear layer for create output latent vector
+        self.embedding = nn.Linear(64*7*7,128)# linear layer for create output latent vector
 
     def forward(self,x):
-        x = self.sequential(x)
+        x = self.conv_layers(x)
+        # print("error is here",x.shape)
         x = self.flatten(x)
+        # print("checking flatten",x.shape)
         return (self.embedding(x))
 
     
 # input to this should be a torch
 
 # we want our model to create a model use same weights and then predict two distances and compare loss
+
+class SiameseNetwork(nn.Module):
+
+    def __init__(self):
+
+        super().__init__()
+        self.embedding = CNNEmbedding()
+    def forward(self, img1, img2):
+        embd1 = self.embedding(img1)
+        embd2 = self.embedding(img2)
+
+
+
+
+        # calculate the distance which is l2 norm
+
+        return embd1, embd2
+
+def distance(embd1, embd2):
+    return(
+        torch.linalg.vector_norm( embd1 - embd2,ord=2,dim=0)
+    )
+
+
+if __name__ == "__main__":
+    # testing the functions
+    # create a test data of expected image dimentions pass it to the cnn embedding and then calculate if this is working
+    img1 = torch.rand(28,28).unsqueeze(0)
+    img2 = torch.rand(28,28).unsqueeze(0)
+    # print(img1.shape)
+
+    model = SiameseNetwork()
+
+    embd1, embd2 = model(img1, img2)
+
+    # print("embedding dimention",embd1.shape, embd2.shape)
+
+    distance = distance(embd1,embd2)
+    # print(distance)
+
