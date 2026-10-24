@@ -36,7 +36,7 @@ class CNNEmbedding(nn.Module):
         )
 
         # we need flattened output
-        self.flatten = nn.Flatten(start_dim=0)# our dimention[0] will be preserved and after all that will be merged
+        self.flatten = nn.Flatten(start_dim=1)# our dimention[0] will be preserved and after all that will be merged, as dimention 0 is the no of images in our batch we dont want to merge across the batches
 
         self.embedding = nn.Linear(64*7*7,128)# linear layer for create output latent vector
 
@@ -71,15 +71,15 @@ class SiameseNetwork(nn.Module):
 
 def distance(embd1, embd2):
     return(
-        torch.linalg.vector_norm( embd1 - embd2,ord=2,dim=0)
+        torch.linalg.vector_norm( embd1 - embd2,ord=2,dim=1) # di
     )
 
 
 if __name__ == "__main__":
     # testing the functions
     # create a test data of expected image dimentions pass it to the cnn embedding and then calculate if this is working
-    img1 = torch.rand(28,28).unsqueeze(0)
-    img2 = torch.rand(28,28).unsqueeze(0)
+    img1 = torch.rand(4,1,28,28)
+    img2 = torch.rand(4,1,28,28)
     # print(img1.shape)
 
     model = SiameseNetwork()
